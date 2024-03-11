@@ -38,7 +38,7 @@ def process_files(
         duration_output, _ = duration_process.communicate()
         duration = float(duration_output.strip())
         with tqdm.tqdm(
-            desc=f"Processing {video_file}", total=int(duration)
+            desc=f"Processing {video_name}", total=int(duration)
         ) as pbar:
             cmd = [
                 "ffmpeg", "-y", "-i", video_file, "-vf",
