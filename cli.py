@@ -1,10 +1,13 @@
 import argparse
 import multiprocessing
 import os
+import re
 import shutil
 import subprocess
 import sys
 import time
+
+import tqdm
 
 import cfg
 
@@ -24,13 +27,50 @@ def process_files(
         os.rename(subtitle_from_path, subtitle_to_path)
         video_sub_file = video_name + cfg.video_translated_sub_suffix
         os.chdir(video_sub_dir)
-        subprocess.run(
-            ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i",
-             video_file, "-vf", f"subtitles={subtitle_file}", video_sub_file]
+        duration_cmd = [
+            "ffprobe", "-v", "error", "-show_entries", "format=duration",
+            "-of", "default=noprint_wrappers=1:nokey=1", video_file
+        ]
+        duration_process = subprocess.Popen(
+            duration_cmd, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE, universal_newlines=True
         )
+        duration_output, _ = duration_process.communicate()
+        duration = float(duration_output.strip())
+        with tqdm.tqdm(
+            desc=f"Processing {video_file}", total=int(duration)
+        ) as pbar:
+            cmd = [
+                "ffmpeg", "-y", "-i", video_file, "-vf",
+                f"subtitles={subtitle_file}", video_sub_file
+            ]
+            process = subprocess.Popen(
+                cmd, stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE, universal_newlines=True
+            )
+            for line in process.stderr:
+                progress = parse_progress(line, duration)
+                if progress is not None:
+                    pbar.update(progress)
+            process.wait()
+            pbar.update(int(duration) - pbar.n % int(duration))
         os.chdir(original_dir)
         os.rename(video_no_sub_to_path, video_no_sub_from_path)
         os.rename(subtitle_to_path, subtitle_from_path)
+
+
+def parse_progress(line, duration):
+    """
+    Parse ffmpeg output to extract progress percentage.
+    """
+    if "frame=" in line and "fps=" in line:
+        match = re.search(r"time=(\d+):(\d+):(\d+.\d+)", line)
+        if match:
+            hours, minutes, seconds = map(float, match.groups())
+            total_seconds = hours * 3600 + minutes * 60 + seconds
+            progress = int((total_seconds / duration) * 100)
+            return progress
+    return None
 
 
 def nice_time_cost(time_cost):
