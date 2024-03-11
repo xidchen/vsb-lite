@@ -25,7 +25,7 @@ def process_files(
         video_sub_file = video_name + cfg.video_translated_sub_suffix
         os.chdir(video_sub_dir)
         subprocess.run(
-            ["ffmpeg", "-y", "-i",
+            ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i",
              video_file, "-vf", f"subtitles={subtitle_file}", video_sub_file]
         )
         os.chdir(original_dir)
@@ -45,6 +45,7 @@ def nice_time_cost(time_cost):
 
 
 if __name__ == "__main__":
+    root_dir = os.path.dirname(os.path.realpath(__file__))
     multiprocessing.set_start_method("spawn")
     parser = argparse.ArgumentParser(description="video subtitle burner")
     parser.add_argument(
@@ -66,6 +67,9 @@ if __name__ == "__main__":
     video_no_sub_dir = args["video_no_sub_dir"]
     translated_sub_dir = args["translated_sub_dir"]
     video_translated_sub_dir = args["video_translated_sub_dir"]
+    video_no_sub_dir = str(os.path.join(root_dir, video_no_sub_dir))
+    translated_sub_dir = str(os.path.join(root_dir, translated_sub_dir))
+    video_translated_sub_dir = str(os.path.join(root_dir, video_translated_sub_dir))
     if not os.path.exists(video_no_sub_dir):
         print(f"Video directory does not exist: {video_no_sub_dir}")
         sys.exit(0)
