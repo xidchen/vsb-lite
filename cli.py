@@ -42,7 +42,8 @@ def process_files(
         ) as pbar:
             cmd = [
                 "ffmpeg", "-y", "-i", video_file, "-vf",
-                f"subtitles={subtitle_file}", video_sub_file
+                f"subtitles={subtitle_file}:force_style='MarginV=40'",
+                video_sub_file
             ]
             process = subprocess.Popen(
                 cmd, stdout=subprocess.PIPE,
@@ -144,7 +145,7 @@ if __name__ == "__main__":
         shutil.rmtree(video_translated_sub_dir)
     os.makedirs(video_translated_sub_dir)
     num_videos = len(video_no_sub_files)
-    num_processes = min(num_videos, multiprocessing.cpu_count())
+    num_processes = min(num_videos, multiprocessing.cpu_count(), cfg.max_processes)
     chunk_size = num_videos // num_processes
     remainder = num_videos % num_processes
     chunks = []
