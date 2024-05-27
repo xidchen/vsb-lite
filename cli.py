@@ -37,6 +37,12 @@ def process_files(
         )
         duration_output, _ = duration_process.communicate()
         duration = float(duration_output.strip())
+        if duration and not os.path.getsize(subtitle_file):
+            shutil.copyfile(video_file, video_sub_file)
+            os.chdir(original_dir)
+            os.rename(video_no_sub_to_path, video_no_sub_from_path)
+            os.rename(subtitle_to_path, subtitle_from_path)
+            continue
         with tqdm.tqdm(
             desc=f"Processing {video_name}", total=int(duration)
         ) as pbar:
