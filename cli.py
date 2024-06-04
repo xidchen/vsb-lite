@@ -48,7 +48,9 @@ def process_files(
         ) as pbar:
             cmd = [
                 "ffmpeg", "-y", "-i", video_file, "-vf",
-                f"subtitles={subtitle_file}:force_style='MarginV=40'",
+                f"subtitles={subtitle_file}:"
+                f"force_style='Alignment={cfg.alignment},"
+                f"Fontsize={cfg.font_size},MarginV={cfg.margin_v}'",
                 video_sub_file
             ]
             process = subprocess.Popen(

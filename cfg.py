@@ -7,3 +7,6 @@ translated_sub_suffix = "_translated.srt"
 video_translated_sub_suffix = "_translated_sub.mp4"
 
 max_processes = 10
+alignment = 2
+font_size = 12
+margin_v = 40
