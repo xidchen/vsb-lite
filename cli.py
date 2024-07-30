@@ -153,6 +153,7 @@ if __name__ == "__main__":
         shutil.rmtree(video_translated_sub_dir)
     os.makedirs(video_translated_sub_dir)
     num_videos = len(video_no_sub_files)
+    print(f"Number of videos to be burned: {num_videos}")
     num_processes = min(num_videos, multiprocessing.cpu_count(), cfg.max_processes)
     chunk_size = num_videos // num_processes
     remainder = num_videos % num_processes
