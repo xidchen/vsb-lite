@@ -15,7 +15,7 @@ import cfg
 def process_files(
     video_dir, files, subtitle_dir, video_sub_dir, vn_mapping, vs_mapping
 ):
-    for video_file in files:
+    for video_file in sorted(files):
         original_dir = os.path.dirname(os.path.realpath(__file__))
         video_no_sub_from_path = os.path.join(video_dir, video_file)
         video_no_sub_to_path = os.path.join(video_sub_dir, video_file)
