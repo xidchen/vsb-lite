@@ -19,12 +19,12 @@ def process_files(
         original_dir = os.path.dirname(os.path.realpath(__file__))
         video_no_sub_from_path = os.path.join(video_dir, video_file)
         video_no_sub_to_path = os.path.join(video_sub_dir, video_file)
-        os.rename(video_no_sub_from_path, video_no_sub_to_path)
+        shutil.copyfile(video_no_sub_from_path, video_no_sub_to_path)
         video_name = vn_mapping[video_file]
         subtitle_file = vs_mapping[video_file]
         subtitle_from_path = os.path.join(subtitle_dir, subtitle_file)
         subtitle_to_path = os.path.join(video_sub_dir, subtitle_file)
-        os.rename(subtitle_from_path, subtitle_to_path)
+        shutil.copyfile(subtitle_from_path, subtitle_to_path)
         video_sub_file = video_name + cfg.video_translated_sub_suffix
         os.chdir(video_sub_dir)
         duration_cmd = [
@@ -40,8 +40,8 @@ def process_files(
         if duration and not os.path.getsize(subtitle_file):
             shutil.copyfile(video_file, video_sub_file)
             os.chdir(original_dir)
-            os.rename(video_no_sub_to_path, video_no_sub_from_path)
-            os.rename(subtitle_to_path, subtitle_from_path)
+            os.remove(video_no_sub_to_path)
+            os.remove(subtitle_to_path)
             continue
         with tqdm.tqdm(
             desc=f"Processing {video_name}", total=int(duration)
@@ -64,8 +64,8 @@ def process_files(
             process.wait()
             pbar.update(int(duration) - pbar.n % int(duration))
         os.chdir(original_dir)
-        os.rename(video_no_sub_to_path, video_no_sub_from_path)
-        os.rename(subtitle_to_path, subtitle_from_path)
+        os.remove(video_no_sub_to_path)
+        os.remove(subtitle_to_path)
 
 
 def parse_progress(line, duration):
@@ -152,7 +152,7 @@ if __name__ == "__main__":
     if os.path.exists(video_translated_sub_dir):
         shutil.rmtree(video_translated_sub_dir)
     os.makedirs(video_translated_sub_dir)
-    num_videos = len(video_no_sub_files)
+    num_videos = len(video_sub_mapping)
     print(f"Number of videos to be burned: {num_videos}")
     num_processes = min(num_videos, multiprocessing.cpu_count(), cfg.max_processes)
     chunk_size = num_videos // num_processes
