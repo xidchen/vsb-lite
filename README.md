@@ -1,8 +1,6 @@
 # vsb-lite
 
-## Project Introduction
-
-Video-subtitle-burner-Lite (vsb-lite) is a software to burn subtitles into videos.
+The aim of this project is to burn subtitles into videos.
 
 The default input subtitle directory is "subtitle_translated".
 
