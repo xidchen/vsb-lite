@@ -9,4 +9,4 @@ video_translated_sub_suffix = "_translated_sub.mp4"
 max_processes = 1
 alignment = 2
 font_size = 12
-margin_v = 75
+margin_v = 60
