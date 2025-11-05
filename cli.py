@@ -57,10 +57,14 @@ def process_files(
                 cmd, stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE, universal_newlines=True
             )
+            last_progress = 0
             for line in process.stderr:
-                progress = parse_progress(line, duration)
+                progress = parse_progress(line)
                 if progress is not None:
-                    pbar.update(progress)
+                    increment = progress - last_progress
+                    if increment > 0:
+                        pbar.update(int(increment))
+                        last_progress = progress
             process.wait()
             pbar.update(int(duration) - pbar.n % int(duration))
         os.chdir(original_dir)
@@ -68,7 +72,7 @@ def process_files(
         os.remove(subtitle_to_path)
 
 
-def parse_progress(line, duration):
+def parse_progress(line):
     """
     Parse ffmpeg output to extract progress percentage.
     """
@@ -77,8 +81,7 @@ def parse_progress(line, duration):
         if match:
             hours, minutes, seconds = map(float, match.groups())
             total_seconds = hours * 3600 + minutes * 60 + seconds
-            progress = int((total_seconds / duration) * 100)
-            return progress
+            return total_seconds
     return None
 
 
