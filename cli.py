@@ -31,7 +31,7 @@ def process_files(
             "ffprobe", "-v", "error", "-show_entries", "format=duration",
             "-of", "default=noprint_wrappers=1:nokey=1", video_file
         ]
-        duration_process = subprocess.Popen(
+        duration_process: subprocess.Popen = subprocess.Popen(
             duration_cmd, stdout=subprocess.PIPE,
             stderr=subprocess.PIPE, universal_newlines=True
         )
@@ -91,6 +91,8 @@ def nice_time_cost(time_cost):
         return f"{int(minutes)}m {int(seconds)}s"
     elif seconds:
         return f"{int(seconds)}s"
+    else:
+        return "0s"
 
 
 if __name__ == "__main__":
