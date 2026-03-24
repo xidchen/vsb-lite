@@ -51,6 +51,7 @@ def process_files(
                 f"subtitles={subtitle_file}:"
                 f"force_style='Alignment={cfg.alignment},"
                 f"Fontsize={cfg.font_size},MarginV={cfg.margin_v}'",
+                "-c:v", "libx264", "-crf", "18", "-c:a", "copy",
                 video_sub_file
             ]
             process = subprocess.Popen(
