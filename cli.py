@@ -51,7 +51,7 @@ def process_files(
                 f"subtitles={subtitle_file}:"
                 f"force_style='Alignment={cfg.alignment},"
                 f"Fontsize={cfg.font_size},MarginV={cfg.margin_v}'",
-                "-c:v", "libx264", "-crf", "18", "-c:a", "copy",
+                "-c:v", "libx264", "-crf", "10", "-c:a", "copy",
                 video_sub_file
             ]
             process = subprocess.Popen(
@@ -155,9 +155,7 @@ if __name__ == "__main__":
         else:
             print(f"Video does not have a subtitle file: {video_no_sub_file}")
             sys.exit(0)
-    if os.path.exists(video_translated_sub_dir):
-        shutil.rmtree(video_translated_sub_dir)
-    os.makedirs(video_translated_sub_dir)
+    os.makedirs(video_translated_sub_dir, exist_ok=True)
     num_videos = len(video_sub_mapping)
     print(f"Number of videos to be burned: {num_videos}")
     num_processes = min(num_videos, multiprocessing.cpu_count(), cfg.max_processes)
