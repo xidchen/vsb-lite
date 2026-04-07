@@ -50,7 +50,7 @@ def process_files(
                 "ffmpeg", "-y", "-i", video_file, "-vf",
                 f"subtitles={subtitle_file}:"
                 f"force_style='Alignment={cfg.alignment},"
-                f"Fontsize={cfg.font_size},MarginV={cfg.margin_v}'",
+                f"Fontsize={cfg.font_size},MarginV={cfg.margin_v},MarginL={cfg.margin_l}'",
                 "-c:v", "libx264", "-crf", "18", "-c:a", "copy",
                 video_sub_file
             ]
