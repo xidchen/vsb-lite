@@ -13,7 +13,8 @@ import cfg
 
 
 def process_files(
-    video_dir, files, subtitle_dir, video_sub_dir, vn_mapping, vs_mapping
+    video_dir: str, files: list[str], subtitle_dir: str, video_sub_dir: str,
+    vn_mapping: dict[str, str], vs_mapping: dict[str, str]
 ):
     for video_file in sorted(files):
         original_dir = os.path.dirname(os.path.realpath(__file__))
@@ -49,8 +50,8 @@ def process_files(
             cmd = [
                 "ffmpeg", "-y", "-i", video_file, "-vf",
                 f"subtitles={subtitle_file}:"
-                f"force_style='Alignment={cfg.alignment},"
-                f"Fontsize={cfg.font_size},MarginV={cfg.margin_v},MarginL={cfg.margin_l}'",
+                f"force_style='Alignment={cfg.alignment},Fontsize={cfg.font_size},"
+                f"MarginV={cfg.margin_v},MarginL={cfg.margin_l}'",
                 "-c:v", "libx264", "-crf", "18", "-c:a", "copy",
                 video_sub_file
             ]
@@ -59,13 +60,15 @@ def process_files(
                 stderr=subprocess.PIPE, universal_newlines=True
             )
             last_progress = 0
-            for line in process.stderr:
-                progress = parse_progress(line)
-                if progress is not None:
-                    increment = progress - last_progress
-                    if increment > 0:
-                        pbar.update(int(increment))
-                        last_progress = progress
+            stderr = process.stderr
+            if stderr is not None:
+                for line in stderr:
+                    progress = parse_progress(line)
+                    if progress is not None:
+                        increment = progress - last_progress
+                        if increment > 0:
+                            pbar.update(int(increment))
+                            last_progress = progress
             process.wait()
             pbar.update(int(duration) - pbar.n % int(duration))
         os.chdir(original_dir)
@@ -73,7 +76,7 @@ def process_files(
         os.remove(subtitle_to_path)
 
 
-def parse_progress(line):
+def parse_progress(line: str):
     """
     Parse ffmpeg output to extract progress percentage.
     """
@@ -86,7 +89,7 @@ def parse_progress(line):
     return None
 
 
-def nice_time_cost(time_cost):
+def nice_time_cost(time_cost: float) -> str:
     hours, minutes = divmod(time_cost, 3600)
     minutes, seconds = divmod(minutes, 60)
     if hours:
